@@ -1,0 +1,38 @@
+image: maven:latest
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+
+before_script:
+  - echo `pwd`
+  - echo "Start build"
+
+stages:
+  - build
+  - test
+
+Build:
+  stage: build
+  tags:
+    - ugrad
+  script:
+    -  mvn -f $(pwd)/pom.xml compile
+
+Test:
+  stage: test
+  tags:
+    - ugrad
+  script:
+    - mvn -f $(pwd)/pom.xml verify
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - $(pwd)/target/surefire-reports/TEST-*.xml
+
+after_script:
+  - echo "Build and Test completed"
